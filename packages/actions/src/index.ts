@@ -8,3 +8,4 @@ export * from "./scheduling/ics.ts";
 export * from "./scheduling/calendar.ts";
 export * from "./notifications/feed.ts";
 export * from "./notifications/delivery.ts";
+export * from "./cases/case-manager.ts";
