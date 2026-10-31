@@ -1,14 +1,17 @@
 import { validateEnv } from '@promise-keeper/runtime';
+import { WorkerRegistry } from './registry.js';
+
+export * from './registry.js';
 
 export interface WorkerLifecycle {
   running: boolean;
-  registeredJobTypes: string[];
+  registry: WorkerRegistry;
   stop: () => Promise<void>;
 }
 
 export function createWorker(): WorkerLifecycle {
   const env = validateEnv();
-  const registeredJobTypes: string[] = [];
+  const registry = new WorkerRegistry();
   let isRunning = true;
 
   console.log(`[Worker] Initialized with mode: ${env.PROCESSING_MODE}`);
@@ -26,12 +29,11 @@ export function createWorker(): WorkerLifecycle {
     get running() {
       return isRunning;
     },
-    registeredJobTypes,
+    registry,
     stop,
   };
 }
 
-// Direct execution entry point
 if (process.argv[1]?.endsWith('worker/dist/index.js') || process.argv[1]?.endsWith('worker/src/index.ts')) {
   createWorker();
 }
