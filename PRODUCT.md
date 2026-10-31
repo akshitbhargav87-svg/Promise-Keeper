@@ -378,7 +378,7 @@ Ten areas × seven ordered tasks = seventy application tasks. Each area owns ver
 | A09 | Identity, tenant isolation, privacy, lifecycle | Test principal contract | A01 DB/storage; every feature's scoped adapters |
 | A10 | CI, integrated QA, deployment, docs, demo | Blueprint/tooling | All areas for release |
 
-Suggested four-person allocation: person 1 A01 → A09; person 2 A02 → A05; person 3 A03 → A04; person 4 A06 → A08 → A07, with A10 rotated to a person who has finished an area or owned by the integration lead. This is a staffing suggestion, not an automatic reservation. Rebalance by completing/releasing an area; do not hold several idle claims. For three people, complete A01/A02/A04 foundations first, then rotate vertical areas against fixtures.
+Suggested four-person starting wave: person 1 A01, person 2 A02, person 3 A03, person 4 A04. These are starting claims, not permanent portfolios. Rotate to A09 early for real access/consent, A05/A06 for domain persistence, A08 for monitoring/actions, and A07/A10 for assistant/integration. A person approaching an unavailable integration dependency publishes progress, blocks/releases the area, claims the prerequisite area if free, and later returns. Never require one area to be fully complete before starting another area's prerequisite implementation. The task-level dependency map and concrete three/four-person rotation are in [docs/INTEGRATION.md](docs/INTEGRATION.md).
 
 ### 8.1 Integration milestones (gates, not a reduced product)
 

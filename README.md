@@ -13,6 +13,7 @@ This repository currently contains the product blueprint and working team-coordi
 | Complete product, screens, interactions, business rules | [PRODUCT.md](PRODUCT.md) |
 | Available areas and progress | [TASKS.md](TASKS.md), then `python scripts/coord.py list` for live state |
 | How four people and their agents collaborate | [docs/WORKFLOW.md](docs/WORKFLOW.md) |
+| Task-level prerequisites and staffing rotations | [docs/INTEGRATION.md](docs/INTEGRATION.md) |
 | System design, storage, jobs, deployment | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | Shared boundaries, API and event contracts | [docs/CONTRACTS.md](docs/CONTRACTS.md) |
 | Ten execution areas, seven sequential tasks each | [docs/areas/README.md](docs/areas/README.md) |

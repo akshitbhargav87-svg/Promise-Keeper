@@ -42,6 +42,8 @@ Create a separate clone for each agent/person. For worktrees, use separate worki
 
 Every area has tasks T01–T07. Only the first unfinished task may start. Finish/review/approve that task before starting the next. Tasks end in `done` only after review evidence. “Ready to code against fixtures” and “real integration complete” are separate facts in area docs and checkpoint notes.
 
+Consult [INTEGRATION.md](INTEGRATION.md) before planning a person’s next area. Dependencies are on implemented capabilities, usually T01–T06, rather than another area's completion status. With fewer people than areas, publish and release a blocked area so its owner can build an unclaimed prerequisite. Returning preserves its first unfinished task; this is an intentional rotation, not skipping task order.
+
 Example normal task cycle:
 
 ```powershell

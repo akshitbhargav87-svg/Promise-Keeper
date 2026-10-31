@@ -26,3 +26,5 @@ Each area has seven tasks completed in order. Each task specifies output and acc
 - An area is complete when all tasks are reviewed and merged and its full integration evidence is recorded.
 
 **Independent start does not mean dependency-free delivery.** Build adapters to the shared port, use provided fixtures, record needed contracts, and run the real integration as soon as its provider is ready.
+
+Use [the task-level integration map](../INTEGRATION.md) to rotate a three/four-person team. A dependency on another area's implementation milestone does not require that entire area to be marked complete. Release a blocked area with a handoff rather than holding it while its prerequisite is unclaimed.
