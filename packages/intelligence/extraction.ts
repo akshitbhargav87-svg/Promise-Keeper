@@ -3,7 +3,11 @@ import { GemmaHttpAdapter, type GenerateRequest } from "./adapter.ts";
 export type InputKind = "text" | "image" | "pdf_text";
 export interface EvidenceSpan { evidenceId: string; assetVersion: number; spanId: string; text: string; }
 export interface ExtractionInput { evidenceId: string; kind: InputKind | string; text?: string; image?: { mimeType: string; dataBase64: string }; assetVersion: number; spans: EvidenceSpan[]; }
-export interface ExtractionCandidate { candidateKey: string; kind: string; title: string; brandName: string | null; originalWording: string; money: { minor: string; currency: string } | null; taxContext: string; deadline: { raw: string | null; precision: string; kind: string; date: string | null; timezone: string | null; anchor: string | null; count: number | null; calendarId: string | null; includeStartDay: boolean | null }; conditions: string[]; sources: Array<{field:string;evidenceId:string;assetVersion:number;spanId:string;excerpt:string}>; reviewIssues: string[]; }
+export type CandidateKind = "price_lock" | "refund" | "delivery" | "trial" | "warranty" | "cashback" | "offer" | "subscription" | "other";
+export type TaxContext = "inclusive" | "exclusive" | "unknown" | "not_applicable";
+export type DeadlinePrecision = "exact" | "estimated" | "unknown";
+export type DeadlineKind = "calendar_days" | "business_days" | "calendar_date" | "instant" | "unknown";
+export interface ExtractionCandidate { candidateKey: string; kind: CandidateKind; title: string; brandName: string | null; originalWording: string; money: { minor: string; currency: string } | null; taxContext: TaxContext; deadline: { raw: string | null; precision: DeadlinePrecision; kind: DeadlineKind; date: string | null; timezone: string | null; anchor: string | null; count: number | null; calendarId: string | null; includeStartDay: boolean | null }; conditions: string[]; sources: Array<{field:string;evidenceId:string;assetVersion:number;spanId:string;excerpt:string}>; reviewIssues: string[]; }
 export interface ExtractionResult { schemaVersion: 1; evidenceId: string; language: string; candidates: ExtractionCandidate[]; issues: string[]; }
 export class ExtractionError extends Error { readonly code: "unsupported_input"|"invalid_evidence"|"invalid_model_output"|"source_mismatch"; constructor(code: "unsupported_input"|"invalid_evidence"|"invalid_model_output"|"source_mismatch", message: string) { super(message); this.code=code; } }
 
@@ -31,15 +35,70 @@ export async function extractEvidence(adapter: GemmaHttpAdapter, input: Extracti
 }
 
 export function validateResult(value: ExtractionResult, input: ExtractionInput, spans: Map<string,EvidenceSpan>): void {
-  if (!value || value.schemaVersion !== 1 || value.evidenceId !== input.evidenceId || typeof value.language !== "string" || !Array.isArray(value.candidates) || !Array.isArray(value.issues) || value.candidates.length > 30) throw new ExtractionError("invalid_model_output","Extraction result does not match schema v1");
+  if (!isRecord(value) || !hasOnlyKeys(value, ["schemaVersion", "evidenceId", "language", "candidates", "issues"]) ||
+      value.schemaVersion !== 1 || value.evidenceId !== input.evidenceId ||
+      !isNonEmptyString(value.language) || !Array.isArray(value.candidates) ||
+      !isStringArray(value.issues) || value.candidates.length > 30) {
+    throw new ExtractionError("invalid_model_output","Extraction result does not match schema v1");
+  }
   const keys=new Set<string>();
   for(const c of value.candidates){
-    if(!c || typeof c.candidateKey!=="string" || keys.has(c.candidateKey) || typeof c.title!=="string" || !c.title.trim() || typeof c.originalWording!=="string" || !Array.isArray(c.sources)||!c.sources.length || !Array.isArray(c.conditions)||!Array.isArray(c.reviewIssues)) throw new ExtractionError("invalid_model_output","Candidate shape is invalid"); keys.add(c.candidateKey);
-    for(const source of c.sources){const known=spans.get(source.spanId); if(!known || source.evidenceId!==input.evidenceId || source.assetVersion!==input.assetVersion || known.evidenceId!==source.evidenceId || known.assetVersion!==source.assetVersion || !known.text.includes(source.excerpt)) throw new ExtractionError("source_mismatch","Candidate cites a missing, foreign, or non-entailing source excerpt");}
+    if(!isRecord(c) || !hasOnlyKeys(c, ["candidateKey", "kind", "title", "brandName", "originalWording", "money", "taxContext", "deadline", "conditions", "sources", "reviewIssues"]) ||
+       !isNonEmptyString(c.candidateKey) || keys.has(c.candidateKey) ||
+       !isCandidateKind(c.kind) || !isNonEmptyString(c.title) ||
+       (c.brandName !== null && !isNonEmptyString(c.brandName)) ||
+       !isNonEmptyString(c.originalWording) || !isMoney(c.money) ||
+       !isTaxContext(c.taxContext) || !isDeadline(c.deadline) ||
+       !isStringArray(c.conditions) || !Array.isArray(c.sources) || !c.sources.length ||
+       !isStringArray(c.reviewIssues)) {
+      throw new ExtractionError("invalid_model_output","Candidate shape is invalid");
+    }
+    keys.add(c.candidateKey);
+    for(const source of c.sources){
+      if(!isSource(source)) throw new ExtractionError("invalid_model_output","Candidate source shape is invalid");
+      const known=spans.get(source.spanId);
+      if(!known || source.evidenceId!==input.evidenceId || source.assetVersion!==input.assetVersion || known.evidenceId!==source.evidenceId || known.assetVersion!==source.assetVersion || !known.text.includes(source.excerpt)) throw new ExtractionError("source_mismatch","Candidate cites a missing, foreign, or non-entailing source excerpt");
+    }
     const cites=(field:string)=>c.sources.some(s=>s.field===field);
+    if(!cites("title")) throw new ExtractionError("source_mismatch","Title assertion lacks a source citation");
     if(c.brandName&&!cites("brandName")) throw new ExtractionError("source_mismatch","Brand assertion lacks a source citation");
     if(c.money&&!cites("money")) throw new ExtractionError("source_mismatch","Money assertion lacks a source citation");
     if(c.deadline?.precision!=="unknown"&&!cites("deadline")) throw new ExtractionError("source_mismatch","Deadline assertion lacks a source citation");
     if(c.conditions.length&&!cites("conditions")) throw new ExtractionError("source_mismatch","Condition assertion lacks a source citation");
   }
+}
+
+const candidateKinds = new Set<CandidateKind>(["price_lock", "refund", "delivery", "trial", "warranty", "cashback", "offer", "subscription", "other"]);
+const taxContexts = new Set<TaxContext>(["inclusive", "exclusive", "unknown", "not_applicable"]);
+const deadlinePrecisions = new Set<DeadlinePrecision>(["exact", "estimated", "unknown"]);
+const deadlineKinds = new Set<DeadlineKind>(["calendar_days", "business_days", "calendar_date", "instant", "unknown"]);
+function isRecord(value: unknown): value is Record<string, unknown> { return typeof value === "object" && value !== null && !Array.isArray(value); }
+function hasOnlyKeys(value: Record<string, unknown>, keys: string[]): boolean { const allowed = new Set(keys); return Object.keys(value).every(key => allowed.has(key)); }
+function isNonEmptyString(value: unknown): value is string { return typeof value === "string" && value.trim().length > 0; }
+function isStringArray(value: unknown): value is string[] { return Array.isArray(value) && value.every(item => typeof item === "string"); }
+function isCandidateKind(value: unknown): value is CandidateKind { return typeof value === "string" && candidateKinds.has(value as CandidateKind); }
+function isTaxContext(value: unknown): value is TaxContext { return typeof value === "string" && taxContexts.has(value as TaxContext); }
+function isMoney(value: unknown): value is { minor: string; currency: string } | null {
+  if(value === null) return true;
+  return isRecord(value) && hasOnlyKeys(value, ["minor", "currency"]) &&
+    typeof value.minor === "string" && /^-?[0-9]+$/.test(value.minor) &&
+    typeof value.currency === "string" && /^[A-Z]{3}$/.test(value.currency);
+}
+function isDeadline(value: unknown): value is ExtractionCandidate["deadline"] {
+  return isRecord(value) && hasOnlyKeys(value, ["raw", "precision", "kind", "date", "timezone", "anchor", "count", "calendarId", "includeStartDay"]) &&
+    (value.raw === null || typeof value.raw === "string") &&
+    typeof value.precision === "string" && deadlinePrecisions.has(value.precision as DeadlinePrecision) &&
+    typeof value.kind === "string" && deadlineKinds.has(value.kind as DeadlineKind) &&
+    (value.date === null || typeof value.date === "string") &&
+    (value.timezone === null || typeof value.timezone === "string") &&
+    (value.anchor === null || typeof value.anchor === "string") &&
+    (value.count === null || (Number.isInteger(value.count) && value.count >= 0)) &&
+    (value.calendarId === null || typeof value.calendarId === "string") &&
+    (value.includeStartDay === null || typeof value.includeStartDay === "boolean");
+}
+function isSource(value: unknown): value is ExtractionCandidate["sources"][number] {
+  return isRecord(value) && hasOnlyKeys(value, ["field", "evidenceId", "assetVersion", "spanId", "excerpt"]) &&
+    isNonEmptyString(value.field) && isNonEmptyString(value.evidenceId) &&
+    Number.isInteger(value.assetVersion) && value.assetVersion >= 1 &&
+    isNonEmptyString(value.spanId) && isNonEmptyString(value.excerpt);
 }
