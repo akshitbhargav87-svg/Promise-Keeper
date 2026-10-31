@@ -10,6 +10,7 @@ test("rejects malformed contract fields and uncited titles",()=>{
   assert.throws(()=>validateResult({...result,candidates:[{...result.candidates[0],kind:"invalid" as never}]},input,new Map([["s1",source()]])),/Candidate shape/);
   assert.throws(()=>validateResult({...result,candidates:[{...result.candidates[0],money:{minor:"19.9",currency:"INR"}}]},input,new Map([["s1",source()]])),/Candidate shape/);
   assert.throws(()=>validateResult({...result,candidates:[{...result.candidates[0],sources:[result.candidates[0].sources[1]]}]},input,new Map([["s1",source()]])),/Title assertion/);
+  assert.throws(()=>validateResult({...result,candidates:[{...result.candidates[0],sources:[{...result.candidates[0].sources[0],field:"madeUp"}]}]},input,new Map([["s1",source()]])),/source shape/);
 });
 test("unsupported formats fail closed and never create guessed candidates",async()=>{await assert.rejects(extractEvidence({} as never,{...input,kind:"application/pdf"},{promptVersion:"p",schemaVersion:"1",timeoutMs:1}),{code:"unsupported_input"});});
 test("money uses integer minor units including negative refunds and zero exponent",()=>{assert.deepEqual(normalizeMoney("199.00","INR"),{minor:"19900",currency:"INR"});assert.equal(normalizeMoney("-1.50","USD").minor,"-150");assert.equal(normalizeMoney("35","JPY").minor,"35");assert.throws(()=>normalizeMoney("1.001","USD"));});

@@ -98,7 +98,8 @@ function isDeadline(value: unknown): value is ExtractionCandidate["deadline"] {
 }
 function isSource(value: unknown): value is ExtractionCandidate["sources"][number] {
   return isRecord(value) && hasOnlyKeys(value, ["field", "evidenceId", "assetVersion", "spanId", "excerpt"]) &&
-    isNonEmptyString(value.field) && isNonEmptyString(value.evidenceId) &&
+    isNonEmptyString(value.field) && sourceFields.has(value.field) && isNonEmptyString(value.evidenceId) &&
     Number.isInteger(value.assetVersion) && value.assetVersion >= 1 &&
     isNonEmptyString(value.spanId) && isNonEmptyString(value.excerpt);
 }
+const sourceFields = new Set(["brandName", "title", "money", "deadline", "conditions"]);
