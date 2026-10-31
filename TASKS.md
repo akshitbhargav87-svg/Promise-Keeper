@@ -3,7 +3,7 @@
 > Live authority: this file on the remote `coordination` branch. Other branches contain snapshots.
 > Run `python scripts/coord.py list` before selecting work. Offline snapshots do not grant ownership.
 
-Revision: **26** · Updated (UTC): **2026-10-31T07:22:56.149016Z**
+Revision: **27** · Updated (UTC): **2026-10-31T07:25:58.648819Z**
 
 All application work starts pending. Blueprint/tooling completion does not complete application tasks.
 
@@ -14,7 +14,7 @@ All application work starts pending. Blueprint/tooling completion does not compl
 | A01 | [Platform and shared runtime](docs/areas/A01-platform.md) | claimed | tushar | 4a6c576e-a9f0-459b-b250-b6b64afb4226 | A01-T01 | Tushar explicitly authorized A01+A05 concurrently. All agents: before next board command update scripts/coord.py from origin/codex/a05-tushar-domain (bf1a3c3); older validators reject duplicate owners. A01 ownership/progress preserved; A05 session 01a1907d-2268-7c42-a5d0-4abba1f93be2. |
 | A02 | [Design system, navigation and home](docs/areas/A02-experience.md) | unclaimed | — | — | A02-T01 | — |
 | A03 | [Capture, evidence vault and automatic email tracking](docs/areas/A03-ingestion.md) | unclaimed | — | — | A03-T01 | — |
-| A04 | [Gemma interpretation, comparison and evaluations](docs/areas/A04-intelligence.md) | claimed | akshit | 01a190b3-f88e-7c10-b1a9-f27eb940d8cd | A04-T01 | A04-T01 review update: commits 8cbf8d6, b6f28ca, and latest adapter test commit. Checks passed: node --experimental-strip-types --test packages/intelligence/adapter.test.ts (5/5); python scripts/check_repo.py; python -m unittest discover -s tests -v (13/13). Live provider probe remains blocked by absent hosted credential and self-hosted endpoint; model ID/access and actual image/structured output unsupported status remain unverified. Independent reviewer still required before T02. |
+| A04 | [Gemma interpretation, comparison and evaluations](docs/areas/A04-intelligence.md) | claimed | akshit | 01a190b3-f88e-7c10-b1a9-f27eb940d8cd | A04-T01 | Owner directs implementation progress without waiting for reviewer. Commits pushed through 226cc25. Current package exposes provider adapter/smoke, evidence extraction and source validation, integer money/date rules, conservative comparison, citation-based draft helper, synthetic evaluation fixtures/report. Checks: 12 Node tests, check_repo.py, 13 coordinator unittests passed. Live model capability and A01/A03/A05/A06/A09 worker/data integration remain unverified/unavailable; eval metrics are synthetic only. Do not claim full A04 completion until live/dependency gates are available. |
 | A05 | [Brands, promises and evidence timelines](docs/areas/A05-promises.md) | claimed | tushar | 01a1907d-2268-7c42-a5d0-4abba1f93be2 | A05-T01 | Handoff: branch codex/a05-tushar-domain, PR #1, commit 2712c81. A05-T01 in review; no tasks marked done. Next: independent review then A05-T02. Cross-area port request docs/requests/CR-A05-T01-domain-ports.md. All agents must refresh coordinator from this branch for authorized parallel owners. A01 remains owned by tushar in its original session. |
 | A06 | [Subscriptions, offers and reports](docs/areas/A06-commerce.md) | unclaimed | — | — | A06-T01 | — |
 | A07 | [Grounded assistant, search and reviewed actions](docs/areas/A07-assistant.md) | unclaimed | — | — | A07-T01 | — |
@@ -127,6 +127,7 @@ All application work starts pending. Blueprint/tooling completion does not compl
 | 24 | 2026-10-31T07:20:00.684866Z | tushar | start | A05-T01 | A05-T01: in_progress. |
 | 25 | 2026-10-31T07:22:48.527012Z | tushar | review | A05-T01 | PR #1, commit 2712c81: domain rules, scoped evidence links, revisions/lifecycle/attention, confirmation handler, repository/schema ports. Node domain tests 10/10; Python coordinator tests 14/14; planning checks pass. Production DB/API/UI and TypeScript compiler integration pending; independent review required. |
 | 26 | 2026-10-31T07:22:56.149016Z | tushar | note | A05 | Handoff: branch codex/a05-tushar-domain, PR #1, commit 2712c81. A05-T01 in review; no tasks marked done. Next: independent review then A05-T02. Cross-area port request docs/requests/CR-A05-T01-domain-ports.md. All agents must refresh coordinator from this branch for authorized parallel owners. A01 remains owned by tushar in its original session. |
+| 27 | 2026-10-31T07:25:58.648819Z | akshit | note | A04 | Owner directs implementation progress without waiting for reviewer. Commits pushed through 226cc25. Current package exposes provider adapter/smoke, evidence extraction and source validation, integer money/date rules, conservative comparison, citation-based draft helper, synthetic evaluation fixtures/report. Checks: 12 Node tests, check_repo.py, 13 coordinator unittests passed. Live model capability and A01/A03/A05/A06/A09 worker/data integration remain unverified/unavailable; eval metrics are synthetic only. Do not claim full A04 completion until live/dependency gates are available. |
 
 ## Machine state
 
@@ -164,7 +165,7 @@ Generated by `scripts/coord.py`; do not edit tables or state manually.
     },
     "A04": {
       "agent": "01a190b3-f88e-7c10-b1a9-f27eb940d8cd",
-      "checkpoint": "A04-T01 review update: commits 8cbf8d6, b6f28ca, and latest adapter test commit. Checks passed: node --experimental-strip-types --test packages/intelligence/adapter.test.ts (5/5); python scripts/check_repo.py; python -m unittest discover -s tests -v (13/13). Live provider probe remains blocked by absent hosted credential and self-hosted endpoint; model ID/access and actual image/structured output unsupported status remain unverified. Independent reviewer still required before T02.",
+      "checkpoint": "Owner directs implementation progress without waiting for reviewer. Commits pushed through 226cc25. Current package exposes provider adapter/smoke, evidence extraction and source validation, integer money/date rules, conservative comparison, citation-based draft helper, synthetic evaluation fixtures/report. Checks: 12 Node tests, check_repo.py, 13 coordinator unittests passed. Live model capability and A01/A03/A05/A06/A09 worker/data integration remain unverified/unavailable; eval metrics are synthetic only. Do not claim full A04 completion until live/dependency gates are available.",
       "completed": false,
       "name": "Gemma interpretation, comparison and evaluations",
       "owner": "akshit",
@@ -427,9 +428,17 @@ Generated by `scripts/coord.py`; do not edit tables or state manually.
       "message": "Handoff: branch codex/a05-tushar-domain, PR #1, commit 2712c81. A05-T01 in review; no tasks marked done. Next: independent review then A05-T02. Cross-area port request docs/requests/CR-A05-T01-domain-ports.md. All agents must refresh coordinator from this branch for authorized parallel owners. A01 remains owned by tushar in its original session.",
       "revision": 26,
       "target": "A05"
+    },
+    {
+      "action": "note",
+      "actor": "akshit",
+      "at": "2026-10-31T07:25:58.648819Z",
+      "message": "Owner directs implementation progress without waiting for reviewer. Commits pushed through 226cc25. Current package exposes provider adapter/smoke, evidence extraction and source validation, integer money/date rules, conservative comparison, citation-based draft helper, synthetic evaluation fixtures/report. Checks: 12 Node tests, check_repo.py, 13 coordinator unittests passed. Live model capability and A01/A03/A05/A06/A09 worker/data integration remain unverified/unavailable; eval metrics are synthetic only. Do not claim full A04 completion until live/dependency gates are available.",
+      "revision": 27,
+      "target": "A04"
     }
   ],
-  "revision": 26,
+  "revision": 27,
   "schemaVersion": 1,
   "tasks": {
     "A01-T01": {
@@ -853,7 +862,7 @@ Generated by `scripts/coord.py`; do not edit tables or state manually.
       "title": "Execute complete-release gate and handoff"
     }
   },
-  "updatedAt": "2026-10-31T07:22:56.149016Z"
+  "updatedAt": "2026-10-31T07:25:58.648819Z"
 }
 ```
 <!-- pk-state:end -->
