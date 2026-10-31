@@ -75,17 +75,12 @@ def validate_state(state: dict) -> None:
             raise CoordError("Board must contain A01 through A10.")
         if set(state["tasks"]) != {f"A{i:02}-T{j:02}" for i in range(1, 11) for j in range(1, 8)}:
             raise CoordError("Board task IDs are invalid.")
-        active_owners = set()
         for aid, area in state["areas"].items():
             if not isinstance(area["completed"], bool):
                 raise CoordError("Area completed flag must be boolean.")
             if area["owner"]:
                 if not HANDLE.fullmatch(area["owner"]) or not HANDLE.fullmatch(area["agent"]):
                     raise CoordError("Invalid owner/session handle.")
-                if not area["completed"]:
-                    if area["owner"] in active_owners:
-                        raise CoordError("One owner cannot hold multiple active areas.")
-                    active_owners.add(area["owner"])
             elif area["agent"] or area["completed"]:
                 raise CoordError("Unclaimed area cannot have a session or be complete.")
             unfinished = False
@@ -163,7 +158,8 @@ def require_handle(value: str, label: str) -> None:
 
 
 def transition(original: dict, action: str, target: str, owner: str,
-               agent: str = "", message: str = "", evidence: str = "", reviewer: str = "", to: str = "") -> dict:
+               agent: str = "", message: str = "", evidence: str = "", reviewer: str = "", to: str = "",
+               allow_parallel: bool = False) -> dict:
     validate_state(original)
     require_handle(owner, "Owner")
     if any(len(v) > 2000 or any(ord(c) < 32 and c not in "\n\t" for c in v)
@@ -184,7 +180,11 @@ def transition(original: dict, action: str, target: str, owner: str,
         if area["owner"] or area["completed"]:
             raise CoordError(f"{aid} is already owned or complete. No claim acquired.")
         if any(a["owner"] == owner and not a["completed"] for a in state["areas"].values()):
-            raise CoordError("Owner already has an active area; complete/release it first.")
+            if not allow_parallel or not message.strip():
+                raise CoordError("Owner already has an active area; explicit user authorization needs --allow-parallel and --message.")
+            if any(a["owner"] == owner and a["agent"] == agent and not a["completed"] for a in state["areas"].values()):
+                raise CoordError("Parallel areas require separate agent sessions/worktrees.")
+            message = f"Parallel ownership authorized: {message}"
         area.update(owner=owner, agent=agent)
         message = message or f"Claimed by {owner}, session {agent}."
     else:
@@ -380,6 +380,8 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--evidence", default="")
         p.add_argument("--reviewer", default="")
         p.add_argument("--to", default="")
+        if action == "claim":
+            p.add_argument("--allow-parallel", action="store_true", help="Only with explicit user authorization recorded in --message")
     args = parser.parse_args(argv)
     repo = args.repo.resolve()
     try:
@@ -407,7 +409,8 @@ def main(argv: list[str] | None = None) -> int:
         else:
             state = mutate_remote(repo, args.remote,
                                   lambda s: transition(s, args.command, args.target, args.owner, args.agent,
-                                                       args.message, args.evidence, args.reviewer, args.to),
+                                                       args.message, args.evidence, args.reviewer, args.to,
+                                                       getattr(args, "allow_parallel", False)),
                                   f"{args.command} {args.target} by {args.owner}")
             print_summary(state, "REMOTE UPDATE CONFIRMED")
         return 0
