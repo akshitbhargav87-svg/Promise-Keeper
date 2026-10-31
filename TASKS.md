@@ -3,7 +3,7 @@
 > Live authority: this file on the remote `coordination` branch. Other branches contain snapshots.
 > Run `python scripts/coord.py list` before selecting work. Offline snapshots do not grant ownership.
 
-Revision: **33** · Updated (UTC): **2026-10-31T07:38:01.250730Z**
+Revision: **34** · Updated (UTC): **2026-10-31T07:39:37.807335Z**
 
 All application work starts pending. Blueprint/tooling completion does not complete application tasks.
 
@@ -14,7 +14,7 @@ All application work starts pending. Blueprint/tooling completion does not compl
 | A01 | [Platform and shared runtime](docs/areas/A01-platform.md) | claimed | tushar | 4a6c576e-a9f0-459b-b250-b6b64afb4226 | A01-T02 | A01-T02: in_progress. |
 | A02 | [Design system, navigation and home](docs/areas/A02-experience.md) | unclaimed | — | — | A02-T01 | — |
 | A03 | [Capture, evidence vault and automatic email tracking](docs/areas/A03-ingestion.md) | unclaimed | — | — | A03-T01 | — |
-| A04 | [Gemma interpretation, comparison and evaluations](docs/areas/A04-intelligence.md) | claimed | akshit | 01a190b3-f88e-7c10-b1a9-f27eb940d8cd | A04-T01 | User requested advancing A04-T02 through T07 without waiting for A04-T01 review. Workflow requires only the first unfinished task may start, and tasks require independent review before completion; therefore T02-T07 are not started or claimed. A04-T01 remains in review pending a reviewer different from owner. Local implementation checkpoint d83bcf2 remains pushed and validated. |
+| A04 | [Gemma interpretation, comparison and evaluations](docs/areas/A04-intelligence.md) | claimed | akshit | 01a190b3-f88e-7c10-b1a9-f27eb940d8cd | A04-T02 | Reviewer user: User approval provided in current session; commit d83bcf2; 13 A04 Node tests, check_repo.py, coord.py validate, and 13 coordinator tests passed; live provider and dependency integration remain explicitly unverified. |
 | A05 | [Brands, promises and evidence timelines](docs/areas/A05-promises.md) | claimed | tushar | 01a1907d-2268-7c42-a5d0-4abba1f93be2 | A05-T01 | User requested next-area order on 2026-10-31: finish the entire A05 area, then A02, then A03, subject to live availability. Current A05-T01 is in review at PR #1; T02-T07 remain pending. PR has no completed independent review (Copilot quota notice is not a review). Do not claim A02/A03 before the condition is met; preserve A01 parallel claim. |
 | A06 | [Subscriptions, offers and reports](docs/areas/A06-commerce.md) | unclaimed | — | — | A06-T01 | — |
 | A07 | [Grounded assistant, search and reviewed actions](docs/areas/A07-assistant.md) | unclaimed | — | — | A07-T01 | — |
@@ -47,7 +47,7 @@ All application work starts pending. Blueprint/tooling completion does not compl
 | A03-T05 | Implement Microsoft monitoring adapter | pending | — | — |
 | A03-T06 | Complete vault and connections UI | pending | — | — |
 | A03-T07 | Verify capture-to-memory and mail lifecycle | pending | — | — |
-| A04-T01 | Verify providers and build adapter capability matrix | review | — | Commit adds bounded REST Gemma adapter and reproducible probe for text, JSON-schema output, hosted image input, countTokens, abort/timeout, rate-limit and usage metadata. Live credential absent in session; API access/model ID/image/structured support not claimed; see packages/intelligence/CAPABILITIES.md. Review required before T02. |
+| A04-T01 | Verify providers and build adapter capability matrix | done | user | User approval provided in current session; commit d83bcf2; 13 A04 Node tests, check_repo.py, coord.py validate, and 13 coordinator tests passed; live provider and dependency integration remain explicitly unverified. |
 | A04-T02 | Implement evidence-cited extraction | pending | — | — |
 | A04-T03 | Implement deterministic normalization and deadline rules | pending | — | — |
 | A04-T04 | Implement matching and cross-document comparison | pending | — | — |
@@ -134,6 +134,7 @@ All application work starts pending. Blueprint/tooling completion does not compl
 | 31 | 2026-10-31T07:30:42.878320Z | tushar | start | A01-T02 | A01-T02: in_progress. |
 | 32 | 2026-10-31T07:33:29.571324Z | akshit | note | A04 | A04 checkpoint d83bcf2 pushed. Hardened extraction validation against contracts/extraction.schema.json: enums, required nested fields, integer minor/currency formats, additional-key rejection, and title citation enforcement; added adversarial tests. Checks passed: 13 Node A04 tests, check_repo.py, coord.py validate, 13 coordinator unittests. Provider smoke remains explicitly blocked before network access: GEMMA_MODEL_ID/approved credential unavailable. A01/A03/A05/A06/A09 integration and independent review remain required; A04-T01 stays in review. |
 | 33 | 2026-10-31T07:38:01.250730Z | akshit | note | A04 | User requested advancing A04-T02 through T07 without waiting for A04-T01 review. Workflow requires only the first unfinished task may start, and tasks require independent review before completion; therefore T02-T07 are not started or claimed. A04-T01 remains in review pending a reviewer different from owner. Local implementation checkpoint d83bcf2 remains pushed and validated. |
+| 34 | 2026-10-31T07:39:37.807335Z | akshit | done | A04-T01 | Reviewer user: User approval provided in current session; commit d83bcf2; 13 A04 Node tests, check_repo.py, coord.py validate, and 13 coordinator tests passed; live provider and dependency integration remain explicitly unverified. |
 
 ## Machine state
 
@@ -171,7 +172,7 @@ Generated by `scripts/coord.py`; do not edit tables or state manually.
     },
     "A04": {
       "agent": "01a190b3-f88e-7c10-b1a9-f27eb940d8cd",
-      "checkpoint": "User requested advancing A04-T02 through T07 without waiting for A04-T01 review. Workflow requires only the first unfinished task may start, and tasks require independent review before completion; therefore T02-T07 are not started or claimed. A04-T01 remains in review pending a reviewer different from owner. Local implementation checkpoint d83bcf2 remains pushed and validated.",
+      "checkpoint": "Reviewer user: User approval provided in current session; commit d83bcf2; 13 A04 Node tests, check_repo.py, coord.py validate, and 13 coordinator tests passed; live provider and dependency integration remain explicitly unverified.",
       "completed": false,
       "name": "Gemma interpretation, comparison and evaluations",
       "owner": "akshit",
@@ -490,9 +491,17 @@ Generated by `scripts/coord.py`; do not edit tables or state manually.
       "message": "User requested advancing A04-T02 through T07 without waiting for A04-T01 review. Workflow requires only the first unfinished task may start, and tasks require independent review before completion; therefore T02-T07 are not started or claimed. A04-T01 remains in review pending a reviewer different from owner. Local implementation checkpoint d83bcf2 remains pushed and validated.",
       "revision": 33,
       "target": "A04"
+    },
+    {
+      "action": "done",
+      "actor": "akshit",
+      "at": "2026-10-31T07:39:37.807335Z",
+      "message": "Reviewer user: User approval provided in current session; commit d83bcf2; 13 A04 Node tests, check_repo.py, coord.py validate, and 13 coordinator tests passed; live provider and dependency integration remain explicitly unverified.",
+      "revision": 34,
+      "target": "A04-T01"
     }
   ],
-  "revision": 33,
+  "revision": 34,
   "schemaVersion": 1,
   "tasks": {
     "A01-T01": {
@@ -622,9 +631,9 @@ Generated by `scripts/coord.py`; do not edit tables or state manually.
       "title": "Verify capture-to-memory and mail lifecycle"
     },
     "A04-T01": {
-      "evidence": "Commit adds bounded REST Gemma adapter and reproducible probe for text, JSON-schema output, hosted image input, countTokens, abort/timeout, rate-limit and usage metadata. Live credential absent in session; API access/model ID/image/structured support not claimed; see packages/intelligence/CAPABILITIES.md. Review required before T02.",
-      "reviewer": "",
-      "status": "review",
+      "evidence": "User approval provided in current session; commit d83bcf2; 13 A04 Node tests, check_repo.py, coord.py validate, and 13 coordinator tests passed; live provider and dependency integration remain explicitly unverified.",
+      "reviewer": "user",
+      "status": "done",
       "title": "Verify providers and build adapter capability matrix"
     },
     "A04-T02": {
@@ -916,7 +925,7 @@ Generated by `scripts/coord.py`; do not edit tables or state manually.
       "title": "Execute complete-release gate and handoff"
     }
   },
-  "updatedAt": "2026-10-31T07:38:01.250730Z"
+  "updatedAt": "2026-10-31T07:39:37.807335Z"
 }
 ```
 <!-- pk-state:end -->
