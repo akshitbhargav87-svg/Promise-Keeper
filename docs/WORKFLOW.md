@@ -27,7 +27,7 @@ If organizational protection prohibits direct writes to `coordination`, a mainta
 
 Owner is a stable, short human handle such as `akshit` or `tushar`, not an API key or email address. Agent is a nonsecret tool/session label such as `codex-laptop-1`. Each area has one accountable human and one current session. The owner is a cooperative assertion, not cryptographically authenticated by this script; Git credentials, review, and optional signed commits provide organizational identity controls. Do not impersonate another owner.
 
-Keep one active area per person by default. The CLI rejects a second active claim for an owner. A finished area becomes available only if explicitly reopened through a reviewed plan change; do not reuse completed task IDs for new scope.
+Keep one active area per person by default. With explicit user authorization, `claim --allow-parallel --message "<authorization and reason>"` permits an additional area with a different agent session and separate working tree. The authorization is recorded in the coordination log; do not fabricate it. Tushar explicitly authorized A01 and A05 concurrently on 31 October 2026. Existing agents must refresh `scripts/coord.py` from the parallel-ownership change before reading/writing a board containing parallel claims; older validators reject multiple areas for one owner. Handoff still requires a recipient with no other active area. A finished area becomes available only if explicitly reopened through a reviewed plan change; do not reuse completed task IDs for new scope.
 
 ```powershell
 python scripts/coord.py list

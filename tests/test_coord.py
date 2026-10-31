@@ -45,6 +45,18 @@ class StateTests(unittest.TestCase):
         state = coord.transition(state, "start", "A04-T02", "alice")
         self.assertEqual(state["tasks"]["A04-T02"]["status"], "in_progress")
 
+    def test_parallel_claim_requires_authorization_reason_and_separate_session(self):
+        state = self.claim()
+        for agent, message in [("agent-2", ""), ("agent-1", "User authorized two areas")]:
+            with self.assertRaises(coord.CoordError):
+                coord.transition(state, "claim", "A05", "alice", agent=agent, message=message, allow_parallel=True)
+        state = coord.transition(state, "claim", "A05", "alice", agent="agent-2",
+                                 message="User explicitly authorized keeping both areas", allow_parallel=True)
+        self.assertEqual(coord.parse(coord.render(state)), state)
+        self.assertEqual(state["areas"]["A04"]["owner"], "alice")
+        self.assertEqual(state["areas"]["A05"]["owner"], "alice")
+        self.assertIn("Parallel ownership authorized", state["events"][-1]["message"])
+
     def test_block_resume_rework_and_checkpoint_escaping(self):
         state = coord.transition(self.claim(), "start", "A04-T01", "alice")
         state = coord.transition(state, "block", "A04-T01", "alice", message="Await CR | pending\n<safe>")
