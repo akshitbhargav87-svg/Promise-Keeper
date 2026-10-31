@@ -1,0 +1,16 @@
+# Copy to CODEOWNERS only after replacing placeholders with real collaborators.
+# This example is intentionally inactive; no review requests go to invented users.
+# /packages/runtime/ @REAL_PLATFORM_OWNER
+# /packages/contracts/ @REAL_PLATFORM_OWNER
+# /packages/ui/ @REAL_DESIGN_OWNER
+# /packages/ingestion/ @REAL_INGESTION_OWNER
+# /packages/intelligence/ @REAL_MODEL_OWNER
+# /packages/promises/ @REAL_PROMISE_OWNER
+# /packages/commerce/ @REAL_COMMERCE_OWNER
+# /packages/assistant/ @REAL_ASSISTANT_OWNER
+# /packages/actions/ @REAL_ACTIONS_OWNER
+# /packages/access/ @REAL_TRUST_OWNER
+# /infra/ @REAL_DELIVERY_OWNER
+# /PRODUCT.md @REAL_PRODUCT_OWNER
+# /AGENTS.md @REAL_MAINTAINER
+# /scripts/coord.py @REAL_MAINTAINER

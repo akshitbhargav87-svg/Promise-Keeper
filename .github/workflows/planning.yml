@@ -1,0 +1,32 @@
+name: Planning and coordination checks
+
+on:
+  push:
+    branches-ignore:
+      - coordination
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  planning:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    env:
+      PYTHONUTF8: "1"
+      GIT_TERMINAL_PROMPT: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Check planning documents, board and fixtures
+        run: python scripts/check_repo.py
+      - name: Validate board snapshot
+        run: python scripts/coord.py validate
+      - name: Test ownership, sequential tasks and concurrent Git claims
+        run: python -m unittest discover -s tests -v

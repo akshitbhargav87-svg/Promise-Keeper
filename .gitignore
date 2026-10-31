@@ -1,0 +1,30 @@
+# Credentials and personal evidence
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*.json
+client_secret*.json
+token*.json
+private-data/
+uploads/
+exports/
+
+# Runtime/build/tool output
+node_modules/
+.next/
+dist/
+coverage/
+playwright-report/
+test-results/
+__pycache__/
+*.py[cod]
+.venv/
+.DS_Store
+Thumbs.db
+*.log
+
+# Local agent/tool config is not a team coordination channel
+.codex/
+.agents/

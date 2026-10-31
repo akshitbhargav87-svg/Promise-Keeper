@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://promise-keeper.local/contracts/extraction.v1.schema.json",
+  "title": "Promise Keeper extraction result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "evidenceId", "language", "candidates", "issues"],
+  "properties": {
+    "schemaVersion": {"type": "integer", "enum": [1]},
+    "evidenceId": {"type": "string", "minLength": 1},
+    "language": {"type": "string", "minLength": 2},
+    "candidates": {"type": "array", "items": {"$ref": "#/$defs/candidate"}},
+    "issues": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "money": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["minor", "currency"],
+      "properties": {
+        "minor": {"type": "string", "pattern": "^-?[0-9]+$"},
+        "currency": {"type": "string", "pattern": "^[A-Z]{3}$"}
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "evidenceId", "assetVersion", "spanId", "excerpt"],
+      "properties": {
+        "field": {"type": "string", "minLength": 1},
+        "evidenceId": {"type": "string", "minLength": 1},
+        "assetVersion": {"type": "integer", "minimum": 1},
+        "spanId": {"type": "string", "minLength": 1},
+        "excerpt": {"type": "string", "minLength": 1}
+      }
+    },
+    "deadline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["raw", "precision", "kind", "date", "timezone", "anchor", "count", "calendarId", "includeStartDay"],
+      "properties": {
+        "raw": {"type": ["string", "null"]},
+        "precision": {"type": "string", "enum": ["exact", "estimated", "unknown"]},
+        "kind": {"type": "string", "enum": ["calendar_days", "business_days", "calendar_date", "instant", "unknown"]},
+        "date": {"type": ["string", "null"]},
+        "timezone": {"type": ["string", "null"]},
+        "anchor": {"type": ["string", "null"]},
+        "count": {"type": ["integer", "null"], "minimum": 0},
+        "calendarId": {"type": ["string", "null"]},
+        "includeStartDay": {"type": ["boolean", "null"]}
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidateKey", "kind", "title", "brandName", "originalWording", "money", "taxContext", "deadline", "conditions", "sources", "reviewIssues"],
+      "properties": {
+        "candidateKey": {"type": "string", "minLength": 1},
+        "kind": {"type": "string", "enum": ["price_lock", "refund", "delivery", "trial", "warranty", "cashback", "offer", "subscription", "other"]},
+        "title": {"type": "string", "minLength": 1},
+        "brandName": {"type": ["string", "null"]},
+        "originalWording": {"type": "string", "minLength": 1},
+        "money": {"$ref": "#/$defs/money"},
+        "taxContext": {"type": "string", "enum": ["inclusive", "exclusive", "unknown", "not_applicable"]},
+        "deadline": {"$ref": "#/$defs/deadline"},
+        "conditions": {"type": "array", "items": {"type": "string"}},
+        "sources": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/source"}},
+        "reviewIssues": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

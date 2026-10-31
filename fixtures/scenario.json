@@ -1,0 +1,60 @@
+{
+  "synthetic": true,
+  "clock": "2026-10-31T05:00:00Z",
+  "timezone": "Asia/Kolkata",
+  "workspace": "demo-workspace",
+  "brand": {"id": "demo-brand", "name": "Nimbus Mobile", "domain": "nimbus.example"},
+  "extraction": {
+    "schemaVersion": 1,
+    "evidenceId": "demo-price-screenshot",
+    "language": "en-IN",
+    "issues": [],
+    "candidates": [{
+      "candidateKey": "price-lock-1",
+      "kind": "price_lock",
+      "title": "Nimbus monthly price locked at INR 199",
+      "brandName": "Nimbus Mobile",
+      "originalWording": "Your monthly plan is locked at INR 199 including taxes for 12 billing periods from 1 October 2026.",
+      "money": {"minor": "19900", "currency": "INR"},
+      "taxContext": "inclusive",
+      "deadline": {
+        "raw": null, "precision": "unknown", "kind": "unknown", "date": null,
+        "timezone": "Asia/Kolkata", "anchor": null, "count": null,
+        "calendarId": null, "includeStartDay": null
+      },
+      "conditions": ["12 billing periods from 1 October 2026", "Same plan and one seat"],
+      "sources": [
+        {"field": "money", "evidenceId": "demo-price-screenshot", "assetVersion": 1, "spanId": "span-price", "excerpt": "INR 199 including taxes"},
+        {"field": "conditions", "evidenceId": "demo-price-screenshot", "assetVersion": 1, "spanId": "span-term", "excerpt": "12 billing periods from 1 October 2026"}
+      ],
+      "reviewIssues": ["Confirm plan and seat count before comparing a bill"]
+    }]
+  },
+  "comparison": {
+    "promised": {"minor": "19900", "currency": "INR"},
+    "observed": {"minor": "34900", "currency": "INR"},
+    "delta": {"minor": "15000", "currency": "INR"},
+    "period": {"start": "2026-10-01", "endExclusive": "2026-11-01"},
+    "taxContext": "inclusive",
+    "samePlanAndSeatsConfirmed": true,
+    "status": "needs_review"
+  },
+  "trial": {
+    "brand": "Studio Example", "renewsAt": "2026-11-07T04:30:00Z",
+    "cancelCutoff": "2026-11-06T04:30:00Z", "precision": "exact",
+    "amount": {"minor": "49900", "currency": "INR"}
+  },
+  "refund": {
+    "originalWording": "Refund within five working days after approval",
+    "anchor": "2026-10-26", "count": 5, "includeStartDay": false,
+    "calendarId": "fixture-mon-fri-no-holidays-v1", "expectedDate": "2026-11-02",
+    "note": "Synthetic calendar only; no claim about Indian public holidays."
+  },
+  "offer": {
+    "brand": "Shop Example", "minimumSpend": {"minor": "200000", "currency": "INR"},
+    "percent": 10, "cap": {"minor": "30000", "currency": "INR"},
+    "purchaseAmount": {"minor": "400000", "currency": "INR"},
+    "expectedBenefit": {"minor": "30000", "currency": "INR"},
+    "eligibility": "unknown"
+  }
+}
