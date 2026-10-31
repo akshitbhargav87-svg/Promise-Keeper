@@ -14,7 +14,7 @@ import {
   DomainEventSchema,
   FeatureRegistry,
   OPENAPI_SPEC,
-} from '../src/index.js';
+} from '../dist/index.js';
 
 test('Money arithmetic and formatting with INR and USD', () => {
   const m1 = parseMoney('19900', 'INR');
@@ -112,4 +112,34 @@ test('OpenAPI specification includes core schemas and paths', () => {
   assert.ok(OPENAPI_SPEC.paths['/promises']);
   assert.ok(OPENAPI_SPEC.components.schemas.Money);
   assert.ok(OPENAPI_SPEC.components.schemas.Principal);
+});
+
+test('Validates scenario extraction against ExtractionResultSchema', async () => {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const { ExtractionResultSchema } = await import('../dist/index.js');
+
+  const scenarioPath = path.resolve('../../fixtures/scenario.json');
+  const scenario = JSON.parse(fs.readFileSync(scenarioPath, 'utf8'));
+
+  const parsed = ExtractionResultSchema.parse(scenario.extraction);
+  assert.equal(parsed.schemaVersion, 1);
+  assert.equal(parsed.candidates.length, 1);
+  assert.equal(parsed.candidates[0].brandName, 'Nimbus Mobile');
+  assert.equal(parsed.candidates[0].money.minor, '19900');
+});
+
+test('Validates contract fixture examples including unauthorized and conflict', async () => {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const { ApiErrorSchema } = await import('../dist/index.js');
+
+  const examplesPath = path.resolve('../../fixtures/contract_examples.json');
+  const examples = JSON.parse(fs.readFileSync(examplesPath, 'utf8'));
+
+  const unauth = ApiErrorSchema.parse(examples.fixtures.unauthorized_access);
+  assert.equal(unauth.error.code, 'CAPABILITY_DENIED');
+
+  const conflict = ApiErrorSchema.parse(examples.fixtures.version_conflict);
+  assert.equal(conflict.error.code, 'VERSION_CONFLICT');
 });

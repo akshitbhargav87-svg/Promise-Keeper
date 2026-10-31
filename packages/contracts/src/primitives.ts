@@ -152,3 +152,42 @@ export const JobRefSchema = z.object({
   jobId: IDSchema,
   status: z.enum(['queued', 'running', 'succeeded', 'failed', 'cancelled']),
 });
+
+export interface Deadline {
+  raw: string | null;
+  precision: DatePrecision;
+  kind: 'calendar' | 'business_days' | 'unknown';
+  date: string | null; // ISO-8601 UTC string or YYYY-MM-DD
+  timezone: string;
+  anchor: string | null;
+  count: number | null;
+  calendarId: string | null;
+  includeStartDay: boolean | null;
+}
+
+export const DeadlineSchema = z.object({
+  raw: z.string().nullable(),
+  precision: DatePrecisionSchema,
+  kind: z.enum(['calendar', 'business_days', 'unknown']),
+  date: z.string().nullable(),
+  timezone: z.string().default('UTC'),
+  anchor: z.string().nullable(),
+  count: z.number().int().nullable(),
+  calendarId: z.string().nullable(),
+  includeStartDay: z.boolean().nullable(),
+});
+
+export interface IdempotencyScope {
+  principalId: ID;
+  workspaceId: ID;
+  route: string;
+  payloadHash: string;
+}
+
+export const IdempotencyScopeSchema = z.object({
+  principalId: IDSchema,
+  workspaceId: IDSchema,
+  route: z.string(),
+  payloadHash: z.string().min(1),
+});
+
