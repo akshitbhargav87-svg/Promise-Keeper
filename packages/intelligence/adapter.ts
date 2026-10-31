@@ -7,6 +7,7 @@ export interface CapabilityReport {
   image: "supported" | "unsupported" | "unknown";
   structuredOutput: "supported" | "unsupported" | "unknown";
   maxInputTokens: number | null;
+  probeInputTokens: number | null;
   cancellation: "supported" | "unsupported" | "unknown";
   rateLimitHandling: "supported" | "unsupported" | "unknown";
 }
@@ -40,7 +41,10 @@ export interface GenerateRequest {
 
 export type AdapterErrorCode = "configuration" | "unsupported_capability" | "input_too_large" | "timeout" | "cancelled" | "rate_limited" | "provider_unavailable" | "provider_error" | "invalid_response";
 export class AdapterError extends Error {
-  constructor(readonly code: AdapterErrorCode, message: string, readonly retryable = false, readonly retryAfterMs: number | null = null) { super(message); this.name = "AdapterError"; }
+  readonly code: AdapterErrorCode;
+  readonly retryable: boolean;
+  readonly retryAfterMs: number | null;
+  constructor(code: AdapterErrorCode, message: string, retryable = false, retryAfterMs: number | null = null) { super(message); this.name = "AdapterError"; this.code = code; this.retryable = retryable; this.retryAfterMs = retryAfterMs; }
 }
 
 export interface GemmaAdapterConfig {
@@ -66,7 +70,9 @@ export class GemmaHttpAdapter implements ModelAdapter {
   readonly mode: ProviderMode;
   private readonly fetcher: typeof fetch;
   private readonly baseUrl: string;
-  constructor(private readonly config: GemmaAdapterConfig) {
+  private readonly config: GemmaAdapterConfig;
+  constructor(config: GemmaAdapterConfig) {
+    this.config = config;
     this.mode = config.mode;
     this.fetcher = config.fetchImpl ?? fetch;
     this.baseUrl = (config.endpoint ?? (config.mode === "hosted" ? "https://generativelanguage.googleapis.com/v1beta" : "")).replace(/\/$/, "");
@@ -79,7 +85,7 @@ export class GemmaHttpAdapter implements ModelAdapter {
   private headers() { return { "content-type": "application/json", ...(this.config.mode === "hosted" ? { "x-goog-api-key": this.config.apiKey! } : {}) }; }
 
   async probe(signal?: AbortSignal): Promise<CapabilityReport> {
-    const unavailable: CapabilityReport = { provider: this.mode === "hosted" ? "google-gemini-api" : "self-hosted-gemma", modelId: this.config.modelId, text: unknown, image: unknown, structuredOutput: unknown, maxInputTokens: null, cancellation: "unknown", rateLimitHandling: "supported" };
+    const unavailable: CapabilityReport = { provider: this.mode === "hosted" ? "google-gemini-api" : "self-hosted-gemma", modelId: this.config.modelId, text: unknown, image: unknown, structuredOutput: unknown, maxInputTokens: null, probeInputTokens: null, cancellation: "unknown", rateLimitHandling: "supported" };
     const text = await this.probeGenerate({ contents: [{ role: "user", parts: [{ text: "Reply exactly: OK" }] }], generationConfig: { maxOutputTokens: 8 } }, signal);
     unavailable.text = text.ok ? "supported" : text.unsupported ? "unsupported" : unknown;
     if (!text.ok) return unavailable;
@@ -95,7 +101,7 @@ export class GemmaHttpAdapter implements ModelAdapter {
       unavailable.image = image.ok ? "supported" : image.unsupported ? "unsupported" : unknown;
       // Gemini countTokens gives a real request token count, not a context-window maximum.
       const count = await this.call("countTokens", { contents: [{ role: "user", parts: [{ text: "Promise Keeper capability probe" }] }] }, signal);
-      if (count.ok) { const n = numberOrNull(asRecord(count.json).totalTokens); if (n !== null) unavailable.maxInputTokens = n; }
+      if (count.ok) unavailable.probeInputTokens = numberOrNull(asRecord(count.json).totalTokens);
     }
     return unavailable;
   }
@@ -103,11 +109,12 @@ export class GemmaHttpAdapter implements ModelAdapter {
   private async probeGenerate(body: Record<string, unknown>, signal?: AbortSignal): Promise<{ ok: boolean; unsupported?: boolean; text?: string }> {
     const result = await this.call("generateContent", body, signal);
     if (result.ok) return { ok: !!extractText(result.json), text: extractText(result.json) };
-    if (result.error?.code === "rate_limited" || result.error?.code === "provider_unavailable" || result.error?.code === "timeout") return { ok: false };
-    return { ok: false, unsupported: true };
+    if (result.error?.code === "provider_error") return { ok: false, unsupported: result.error.message.includes("HTTP 400") || result.error.message.includes("HTTP 404") || result.error.message.includes("HTTP 422") };
+    return { ok: false };
   }
 
   private async call(method: string, body: Record<string, unknown>, signal?: AbortSignal): Promise<{ ok: true; json: unknown } | { ok: false; error: AdapterError }> {
+    if (signal?.aborted) throw new AdapterError("cancelled", "Gemma capability probe cancelled");
     const controller = new AbortController(); let timedOut = false;
     const timer = setTimeout(() => { timedOut = true; controller.abort(); }, this.config.timeoutMs);
     const abort = () => controller.abort(signal?.reason); signal?.addEventListener("abort", abort, { once: true });
@@ -122,6 +129,7 @@ export class GemmaHttpAdapter implements ModelAdapter {
   }
 
   async generate(request: GenerateRequest): Promise<GenerationResult> {
+    if (request.signal?.aborted) throw new AdapterError("cancelled", "Gemma request cancelled", false);
     const contentParts: Record<string, unknown>[] = [{ text: request.input }];
     if (request.image) contentParts.push({ inlineData: { mimeType: request.image.mimeType, data: request.image.dataBase64 } });
     const body: Record<string, unknown> = { contents: [{ role: "user", parts: contentParts }] };

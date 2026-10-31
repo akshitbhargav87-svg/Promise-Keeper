@@ -5,16 +5,16 @@ Status date: 2026-10-31. No live provider probe has been run from this environme
 | Capability | Hosted Gemma 4 | Explicit self-hosted Gemma |
 | --- | --- | --- |
 | Model ID/access | Not verified; credential unavailable | Not configured |
-| Text input | Pending smoke test | Pending endpoint configuration |
-| Image input | Pending model-specific smoke test | Pending model-specific smoke test |
-| Structured output | Pending schema-conformance probe | Pending schema-conformance probe |
-| Timeout/cancellation | Adapter must enforce deadline and abort signal | Adapter must enforce deadline and abort signal |
-| Rate limits/retry | Pending provider response verification; bounded retry only | Endpoint-specific, pending |
-| Usage/cost | Capture provider usage; cost unavailable absent rate card | Capture usage if exposed; cost unavailable absent rate card |
-| Input caps | Pending provider/model verification | Deployment-specific, pending |
+| Text input | Probe implemented; live result pending | Probe implemented when endpoint is configured |
+| Image input | Probe implemented; live result pending | Unknown until explicitly probed |
+| Structured output | JSON-schema conformance probe implemented; live result pending | Probe implemented when endpoint supports Gemini-compatible JSON schema |
+| Timeout/cancellation | Request deadline and AbortSignal; remote cancellation best-effort | Same |
+| Rate limits/retry | HTTP 429 classified with retry-after; retries left to bounded job policy | Same for compatible HTTP errors |
+| Usage/cost | Provider token counts captured; cost only with supplied rate card | Token counts captured when returned; cost only with supplied rate card |
+| Input caps | Configured serialized-byte cap enforced. Probe token count is not a context-window limit. | Configured serialized-byte cap enforced; model limit deployment-specific |
 
 ### Smoke test record
 
-- Result: blocked before request; no `GEMINI_API_KEY` or `GOOGLE_API_KEY` is configured.
+- Result: blocked before live request; no `GEMINI_API_KEY` or `GOOGLE_API_KEY` is configured in this session. Mocked probe and adapter checks pass.
 - Model ID: unverified. Do not infer the deployed model from prior conversation or assume model names remain available.
-- Next: configure an approved server-side credential, execute the smoke probe, and record timestamp, model ID, capabilities, latency, usage and sanitized errors. Never store credentials or raw private evidence here.
+- Next: configure an approved server-side credential, execute the smoke probe, and record timestamp, model ID, capabilities, latency, usage and sanitized errors. `CapabilityReport.maxInputTokens` intentionally remains null; `probeInputTokens` is only a count for the probe string, not the model limit. Never store credentials or raw private evidence here.
