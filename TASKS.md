@@ -3,7 +3,7 @@
 > Live authority: this file on the remote `coordination` branch. Other branches contain snapshots.
 > Run `python scripts/coord.py list` before selecting work. Offline snapshots do not grant ownership.
 
-Revision: **46** · Updated (UTC): **2026-10-31T08:08:43.758448Z**
+Revision: **47** · Updated (UTC): **2026-10-31T08:12:24.759755Z**
 
 All application work starts pending. Blueprint/tooling completion does not complete application tasks.
 
@@ -15,7 +15,7 @@ All application work starts pending. Blueprint/tooling completion does not compl
 | A02 | [Design system, navigation and home](docs/areas/A02-experience.md) | unclaimed | — | — | A02-T01 | — |
 | A03 | [Capture, evidence vault and automatic email tracking](docs/areas/A03-ingestion.md) | unclaimed | — | — | A03-T01 | — |
 | A04 | [Gemma interpretation, comparison and evaluations](docs/areas/A04-intelligence.md) | claimed | akshit | 01a190b3-f88e-7c10-b1a9-f27eb940d8cd | A04-T02 | Implementation checkpoint updated: extraction now requires unique scoped source spans, checks cited fields against excerpts, validates exact dates only when deterministically derivable from explicit raw dates/instants, and returns model metadata with bounded repair. Added versioned money/calendar/date helpers; comparison/matching, scoped lexical retrieval and source-validated drafting; adapter config/output/cost limits and strict provider mode; synthetic fixture/evaluator additions. Per owner direction, tests remain unrun. Live Gemma credentials and A01/A03/A05/A06/A09 services remain unavailable for T07. |
-| A05 | [Brands, promises and evidence timelines](docs/areas/A05-promises.md) | claimed | tushar | 01a1907d-2268-7c42-a5d0-4abba1f93be2 | A05-T01 | User requested next-area order on 2026-10-31: finish the entire A05 area, then A02, then A03, subject to live availability. Current A05-T01 is in review at PR #1; T02-T07 remain pending. PR has no completed independent review (Copilot quota notice is not a review). Do not claim A02/A03 before the condition is met; preserve A01 parallel claim. |
+| A05 | [Brands, promises and evidence timelines](docs/areas/A05-promises.md) | claimed | tushar | 01a1907d-2268-7c42-a5d0-4abba1f93be2 | A05-T02 | Owner acceptance (independent review waived): Tushar explicitly directed completing A05 without waiting for independent review; Domain and SQL integration tests 20/20; strict A05 typecheck passed; coordinator tests 15/15. A01 branch integrated for real Next.js runtime. |
 | A06 | [Subscriptions, offers and reports](docs/areas/A06-commerce.md) | unclaimed | — | — | A06-T01 | — |
 | A07 | [Grounded assistant, search and reviewed actions](docs/areas/A07-assistant.md) | unclaimed | — | — | A07-T01 | — |
 | A08 | [Reminders, notifications, cases and evidence packs](docs/areas/A08-actions.md) | claimed | kunal | antigravity-1 | A08-T04 | A08-T04: in_progress. |
@@ -54,7 +54,7 @@ All application work starts pending. Blueprint/tooling completion does not compl
 | A04-T05 | Implement grounded drafting and retrieval support | pending | — | — |
 | A04-T06 | Build and run meaningful evaluation suite | pending | — | — |
 | A04-T07 | Integrate real evidence and publish model report | pending | — | — |
-| A05-T01 | Implement domain rules and repository ports | review | — | PR #1, commit 2712c81: domain rules, scoped evidence links, revisions/lifecycle/attention, confirmation handler, repository/schema ports. Node domain tests 10/10; Python coordinator tests 14/14; planning checks pass. Production DB/API/UI and TypeScript compiler integration pending; independent review required. |
+| A05-T01 | Implement domain rules and repository ports | done | tushar | Domain and SQL integration tests 20/20; strict A05 typecheck passed; coordinator tests 15/15. A01 branch integrated for real Next.js runtime. |
 | A05-T02 | Implement brand registry and identity review | pending | — | — |
 | A05-T03 | Implement canonical promises and explorer | pending | — | — |
 | A05-T04 | Implement promise detail and timeline | pending | — | — |
@@ -147,6 +147,7 @@ All application work starts pending. Blueprint/tooling completion does not compl
 | 44 | 2026-10-31T08:08:04.168937Z | tushar | done | A01-T03 | Reviewer akshit: codex/a01-tushar-platform commit ed756a3; migrations, isolation, and transaction rollback tests passed |
 | 45 | 2026-10-31T08:08:23.240392Z | tushar | start | A01-T04 | A01-T04: in_progress. |
 | 46 | 2026-10-31T08:08:43.758448Z | akshit | note | A04 | Implementation checkpoint updated: extraction now requires unique scoped source spans, checks cited fields against excerpts, validates exact dates only when deterministically derivable from explicit raw dates/instants, and returns model metadata with bounded repair. Added versioned money/calendar/date helpers; comparison/matching, scoped lexical retrieval and source-validated drafting; adapter config/output/cost limits and strict provider mode; synthetic fixture/evaluator additions. Per owner direction, tests remain unrun. Live Gemma credentials and A01/A03/A05/A06/A09 services remain unavailable for T07. |
+| 47 | 2026-10-31T08:12:24.759755Z | tushar | done | A05-T01 | Owner acceptance (independent review waived): Tushar explicitly directed completing A05 without waiting for independent review; Domain and SQL integration tests 20/20; strict A05 typecheck passed; coordinator tests 15/15. A01 branch integrated for real Next.js runtime. |
 
 ## Machine state
 
@@ -192,7 +193,7 @@ Generated by `scripts/coord.py`; do not edit tables or state manually.
     },
     "A05": {
       "agent": "01a1907d-2268-7c42-a5d0-4abba1f93be2",
-      "checkpoint": "User requested next-area order on 2026-10-31: finish the entire A05 area, then A02, then A03, subject to live availability. Current A05-T01 is in review at PR #1; T02-T07 remain pending. PR has no completed independent review (Copilot quota notice is not a review). Do not claim A02/A03 before the condition is met; preserve A01 parallel claim.",
+      "checkpoint": "Owner acceptance (independent review waived): Tushar explicitly directed completing A05 without waiting for independent review; Domain and SQL integration tests 20/20; strict A05 typecheck passed; coordinator tests 15/15. A01 branch integrated for real Next.js runtime.",
       "completed": false,
       "name": "Brands, promises and evidence timelines",
       "owner": "tushar",
@@ -607,9 +608,17 @@ Generated by `scripts/coord.py`; do not edit tables or state manually.
       "message": "Implementation checkpoint updated: extraction now requires unique scoped source spans, checks cited fields against excerpts, validates exact dates only when deterministically derivable from explicit raw dates/instants, and returns model metadata with bounded repair. Added versioned money/calendar/date helpers; comparison/matching, scoped lexical retrieval and source-validated drafting; adapter config/output/cost limits and strict provider mode; synthetic fixture/evaluator additions. Per owner direction, tests remain unrun. Live Gemma credentials and A01/A03/A05/A06/A09 services remain unavailable for T07.",
       "revision": 46,
       "target": "A04"
+    },
+    {
+      "action": "done",
+      "actor": "tushar",
+      "at": "2026-10-31T08:12:24.759755Z",
+      "message": "Owner acceptance (independent review waived): Tushar explicitly directed completing A05 without waiting for independent review; Domain and SQL integration tests 20/20; strict A05 typecheck passed; coordinator tests 15/15. A01 branch integrated for real Next.js runtime.",
+      "revision": 47,
+      "target": "A05-T01"
     }
   ],
-  "revision": 46,
+  "revision": 47,
   "schemaVersion": 1,
   "tasks": {
     "A01-T01": {
@@ -781,9 +790,9 @@ Generated by `scripts/coord.py`; do not edit tables or state manually.
       "title": "Integrate real evidence and publish model report"
     },
     "A05-T01": {
-      "evidence": "PR #1, commit 2712c81: domain rules, scoped evidence links, revisions/lifecycle/attention, confirmation handler, repository/schema ports. Node domain tests 10/10; Python coordinator tests 14/14; planning checks pass. Production DB/API/UI and TypeScript compiler integration pending; independent review required.",
-      "reviewer": "",
-      "status": "review",
+      "evidence": "Domain and SQL integration tests 20/20; strict A05 typecheck passed; coordinator tests 15/15. A01 branch integrated for real Next.js runtime.",
+      "reviewer": "tushar",
+      "status": "done",
       "title": "Implement domain rules and repository ports"
     },
     "A05-T02": {
@@ -1033,7 +1042,7 @@ Generated by `scripts/coord.py`; do not edit tables or state manually.
       "title": "Execute complete-release gate and handoff"
     }
   },
-  "updatedAt": "2026-10-31T08:08:43.758448Z"
+  "updatedAt": "2026-10-31T08:12:24.759755Z"
 }
 ```
 <!-- pk-state:end -->
