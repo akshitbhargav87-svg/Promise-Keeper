@@ -8,6 +8,8 @@ export interface CapabilityReport {
   structuredOutput: "supported" | "unsupported" | "unknown";
   maxInputTokens: number | null;
   probeInputTokens: number | null;
+  reviewRequired: boolean;
+  reviewReasons: string[];
   cancellation: "supported" | "unsupported" | "unknown";
   rateLimitHandling: "supported" | "unsupported" | "unknown";
 }
@@ -85,10 +87,10 @@ export class GemmaHttpAdapter implements ModelAdapter {
   private headers() { return { "content-type": "application/json", ...(this.config.mode === "hosted" ? { "x-goog-api-key": this.config.apiKey! } : {}) }; }
 
   async probe(signal?: AbortSignal): Promise<CapabilityReport> {
-    const unavailable: CapabilityReport = { provider: this.mode === "hosted" ? "google-gemini-api" : "self-hosted-gemma", modelId: this.config.modelId, text: unknown, image: unknown, structuredOutput: unknown, maxInputTokens: null, probeInputTokens: null, cancellation: "unknown", rateLimitHandling: "supported" };
+    const unavailable: CapabilityReport = { provider: this.mode === "hosted" ? "google-gemini-api" : "self-hosted-gemma", modelId: this.config.modelId, text: unknown, image: unknown, structuredOutput: unknown, maxInputTokens: null, probeInputTokens: null, reviewRequired: true, reviewReasons: [], cancellation: "unknown", rateLimitHandling: "supported" };
     const text = await this.probeGenerate({ contents: [{ role: "user", parts: [{ text: "Reply exactly: OK" }] }], generationConfig: { maxOutputTokens: 8 } }, signal);
     unavailable.text = text.ok ? "supported" : text.unsupported ? "unsupported" : unknown;
-    if (!text.ok) return unavailable;
+    if (!text.ok) { unavailable.reviewReasons.push("Text generation was not confirmed; review or configure a supported model."); return unavailable; }
     unavailable.cancellation = "supported"; // AbortSignal is wired to fetch; endpoint cancellation remains best-effort.
     const schema = { type: "OBJECT", properties: { ok: { type: "BOOLEAN" } }, required: ["ok"] };
     const structured = await this.probeGenerate({ contents: [{ role: "user", parts: [{ text: 'Return JSON {"ok":true}.' }] }], generationConfig: { responseMimeType: "application/json", responseSchema: schema, maxOutputTokens: 16 } }, signal);
@@ -103,6 +105,11 @@ export class GemmaHttpAdapter implements ModelAdapter {
       const count = await this.call("countTokens", { contents: [{ role: "user", parts: [{ text: "Promise Keeper capability probe" }] }] }, signal);
       if (count.ok) unavailable.probeInputTokens = numberOrNull(asRecord(count.json).totalTokens);
     }
+    if (unavailable.text !== "supported") unavailable.reviewReasons.push("Text capability is unavailable or unknown.");
+    if (unavailable.structuredOutput !== "supported") unavailable.reviewReasons.push("Structured output is unavailable or unknown; manual review is required for extracted fields.");
+    if (this.mode === "hosted" && unavailable.image !== "supported") unavailable.reviewReasons.push("Image input is unavailable or unknown; image evidence requires OCR/text or manual review.");
+    if (!unavailable.probeInputTokens && this.mode === "hosted") unavailable.reviewReasons.push("Token counting was not confirmed; enforce byte cap and review usage before production budgets.");
+    unavailable.reviewRequired = unavailable.reviewReasons.length > 0;
     return unavailable;
   }
 

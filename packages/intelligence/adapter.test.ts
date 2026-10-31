@@ -57,4 +57,12 @@ test("capability probe distinguishes tested features and probe count from model 
   assert.equal(report.structuredOutput, "supported");
   assert.equal(report.probeInputTokens, 7);
   assert.equal(report.maxInputTokens, null);
+  assert.equal(report.reviewRequired, false);
+});
+
+test("unknown capability explicitly requires review", async()=>{
+  const a=new GemmaHttpAdapter(config(async()=>response(401,{error:{message:"unauthorized"}})));
+  const report=await a.probe();
+  assert.equal(report.reviewRequired,true);
+  assert.match(report.reviewReasons[0],/Text generation/);
 });
