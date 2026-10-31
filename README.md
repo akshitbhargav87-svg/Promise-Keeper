@@ -20,6 +20,7 @@ This repository currently contains the product blueprint and working team-coordi
 | Research, verified facts, assumptions | [docs/SOURCES.md](docs/SOURCES.md) |
 | Decisions and change requests | [docs/DECISIONS.md](docs/DECISIONS.md), [docs/requests/README.md](docs/requests/README.md) |
 | Demo and submission preparation | [docs/LAUNCH.md](docs/LAUNCH.md) |
+| What was set up and verified | [docs/SETUP-REPORT.md](docs/SETUP-REPORT.md) |
 
 ## Give this repository to an AI
 
@@ -31,7 +32,7 @@ For a status-only request:
 
 ## Coordination quick start
 
-Requires Python 3.11+ and Git, with ordinary repository push access. No Python packages or API tokens in command arguments are needed.
+Requires Python 3.11+ and Git, with ordinary repository push access. No Python packages or API tokens in command arguments are needed. The [live team board](https://github.com/akshitbhargav87-svg/Promise-Keeper/blob/coordination/TASKS.md) is initialized; new team members should run `list`, then claim an available area. All ten areas were left unclaimed after setup.
 
 ```powershell
 python scripts/check_repo.py
@@ -39,7 +40,7 @@ python -m unittest discover -s tests -v
 python scripts/coord.py list --offline
 ```
 
-Once the blueprint is committed and pushed to the repository's actual default branch, one maintainer initializes the shared board:
+For a fresh fork without a coordination branch, one maintainer initializes it after pushing the blueprint. Skip `init-remote` in this repository because it is already initialized:
 
 ```powershell
 python scripts/coord.py init-remote --base main --owner YOUR_NAME
