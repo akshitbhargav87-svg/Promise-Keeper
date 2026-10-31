@@ -7,7 +7,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "node --test tests/env.test.mjs",
+    "test": "node --test tests/env.test.mjs && node --test tests/jobs.test.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
