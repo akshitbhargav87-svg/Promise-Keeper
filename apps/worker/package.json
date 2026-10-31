@@ -1,0 +1,21 @@
+{
+  "name": "@promise-keeper/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@promise-keeper/contracts": "*",
+    "@promise-keeper/db": "*",
+    "@promise-keeper/runtime": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "typescript": "^5.7.3"
+  }
+}

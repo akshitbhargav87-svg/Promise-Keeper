@@ -1,0 +1,35 @@
+{
+  "synthetic": true,
+  "clock": "2026-10-31T05:00:00Z",
+  "timezone": "Asia/Kolkata",
+  "fixtures": {
+    "unauthorized_access": {
+      "error": {
+        "code": "CAPABILITY_DENIED",
+        "message": "Principal does not have evidence:read permission on workspace ws-other",
+        "requestId": "req-auth-001",
+        "retryable": false
+      }
+    },
+    "version_conflict": {
+      "error": {
+        "code": "VERSION_CONFLICT",
+        "message": "Resource version mismatch. Provided: 1, Current: 2.",
+        "requestId": "req-conf-002",
+        "retryable": true,
+        "currentVersion": 2
+      }
+    },
+    "uncertain_comparison": {
+      "promised": { "minor": "19900", "currency": "INR" },
+      "observed": { "minor": "34900", "currency": "INR" },
+      "status": "possible_mismatch",
+      "uncertaintyReason": "Observed bill has additional unspecified line item and different tax code",
+      "samePlanAndSeatsConfirmed": false
+    },
+    "zero_and_negative_money": {
+      "zero": { "minor": "0", "currency": "INR" },
+      "refund": { "minor": "-15000", "currency": "INR" }
+    }
+  }
+}

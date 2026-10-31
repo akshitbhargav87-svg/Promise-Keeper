@@ -5,7 +5,7 @@ Date: 2026-10-31. “Selected” is a planning choice, not proof of deployment.
 | ID | Decision | State | Owner/task | Validation/evidence needed |
 | --- | --- | --- | --- | --- |
 | D01 | Responsive web platform with ten bounded work areas | Selected | Maintainer | PRODUCT.md and user request |
-| D02 | TypeScript/Next.js, Node worker, PostgreSQL, S3 | Selected | A01-T01 | Exact versions, compatibility, clean build and disposable DB |
+| D02 | TypeScript 5.7/Next.js 15, Node worker 22, PostgreSQL, S3, Drizzle ORM 0.38, TanStack Query 5, React Hook Form 7, date-fns 4 | Selected | A01-T01 | Pinned monorepo lockfile, clean web/worker build, typed env validation |
 | D03 | Hosted Gemma 4 26B A4B baseline, explicit local alternative | Selected; live validation pending | A04-T01 | Account capability probe, multimodal/JSON tests, latency/cost, terms |
 | D04 | Auth.js OIDC with DB sessions | Selected; compatibility pending | A09-T01 | Current release support and provider test login |
 | D05 | Read-only delegated Gmail/Microsoft integrations | Selected; access readiness pending | A03-T04/T05 + A09-T04 | Provider configuration, callback/webhook validation, scope/policy readiness |
